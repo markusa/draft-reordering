@@ -1,0 +1,43 @@
+# markdown-spellcheck spelling configuration file
+# Format - lines begining # are comments
+# global dictionary is at the start, file overrides afterwards
+# one word per line, to define a file override use ' - filename'
+# where filename is relative to this configuration file
+Markus
+Amend
+Deutsche
+Telekom
+docname
+ipr
+trust200902
+workgroup
+us-ascii
+toc
+sortrefs
+symrefs
+IPv4
+IPv6
+e.g.
+subflow
+bonaventure-iccrg-schedulers
+deconinck-quic-multipath
+ietf-quic-recovery
+huitema-quic-ts
+zhu-intarea-mams-user-protocol
+zhu-intarea-gma
+amend-tsvwg-multipath-dccp
+ietf-quic-datagram
+Multipath
+draft-bla-iccrg-reordering-00
+stand_alone
+NACKs
+TIME_STAMP
+ACKs
+timestamp
+uniflow
+uniflows
+von
+MP-QUIC
+multipath
+pre-delaying
+PDUs

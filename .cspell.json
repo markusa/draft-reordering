@@ -1,0 +1,37 @@
+// cSpell Settings
+{
+    // Version of the setting file.  Always 0.1
+    "version": "0.1",
+    // language - current active spelling language
+    "language": "en_US",
+    // words - list of words to be always considered correct
+    "words": [
+       "Multipath",
+       "docname",
+       "iccrg",
+       "IRTF",
+       "workgroup",
+       "ICCRG",
+       "sortrefs",
+       "symrefs",
+       "Markus",
+       "deconinck",
+       "quic",
+       "multipath",
+       "huitema",
+       "intarea",
+       "tsvwg",
+       "dccp",
+       "datagram",
+       "ATSSS",
+       "MPTCP",
+       "subflow",
+       "QUIC",
+       "uniflows",
+       "ACKs",
+       "NACKs",
+       "uniflow",
+       "PDUs"
+
+    ]
+}

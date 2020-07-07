@@ -2,7 +2,7 @@
 title: Multipath sequence reconstruction
 abbrev: Multipath sequence reconstruction
 docname: draft-bla-iccrg-reordering-00
-date: 2020-06-27
+date: 2020-07-07
 category: exp
 
 ipr: trust200902
@@ -171,15 +171,15 @@ which of course depends on the queue processing and buffering at the Aggregation
 Proxy.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-APP                UE              Aggregation Proxy               Host
- |  SN1 ...  SN8   |                          |                        |
- |---------------->| path 1 SN1 SN3 SN5 SN7...|                        |
- |                 |------------------------->|                        |
- |                 | path 2 SN2 SN4 SN6 SN8...|                        |
- |                 |------------------------->|                        |
- |                 |                          |SN1 SN3 SN2 SN5 SN4 SN7 |
- |                 |                          |=======================>|
- |                 |                          |                        |
+APP              UE              Aggregation Proxy               Host
+ |  SN1 ... SN8  |                          |                       |
+ |-------------->| path 1 SN1 SN3 SN5 SN7...|                       |
+ |               |------------------------->|                       |
+ |               | path 2 SN2 SN4 SN6 SN8...|                       |
+ |               |------------------------->|                       |
+ |               |                          |SN1 SN3 SN2 SN5 SN4 SN7|
+ |               |                          |======================>|
+ |               |                          |                       |
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-scrambling title="Exemplary data transmission for a dual-path scenario"}
 

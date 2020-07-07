@@ -1,7 +1,7 @@
 # draft-reordering [![Build Status](https://travis-ci.com/markusa/draft-reordering.svg?branch=master)](https://travis-ci.com/markusa/draft-reordering)
 IETF draft on reconstruction requirements and mechanisms for multipath split traffic
 
-This is work in progress. Travis has been configured to verify:
+This is work in progress and uses "xml2rfc" v3 vocabulary. Travis has been configured to verify:
 
 - the spelling (see the .cspell.json file if you need to add specific words to be considered correct)
 - the build of the Internet drafts
@@ -11,10 +11,10 @@ Please ensure that the CI tests continue to succeed everytime you submit a pull 
 Get latest `.txt` and `.html` view from `markusa/draft-reordering` `master`branch
 
 **`.txt`**
-[draft-reordering.txt](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc-dev.cgi?url=https://raw.githubusercontent.com/markusa/draft-reordering/master/draft-reordering.mkd&inputtype=kramdown) [(Debug)](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc-dev.cgi?url=https://raw.githubusercontent.com/markusa/draft-reordering/master/draft-reordering.mkd&inputtype=kramdown&type=toframe)
+[draft-reordering.txt](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc-dev.cgi?url=https://raw.githubusercontent.com/markusa/draft-reordering/master/draft-reordering.mkd&inputtype=kramdown&format=v3ascii) [(Debug)](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc-dev.cgi?url=https://raw.githubusercontent.com/markusa/draft-reordering/master/draft-reordering.mkd&inputtype=kramdown&format=v3ascii&type=toframe)
 
 **`.html`**
-[draft-reordering.html](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc-dev.cgi?url=https://raw.githubusercontent.com/markusa/draft-reordering/master/draft-reordering.mkd&inputtype=kramdown&mode=html) [(Debug)](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc-dev.cgi?url=https://raw.githubusercontent.com/markusa/draft-reordering/master/draft-reordering.mkd&inputtype=kramdown&mode=html&type=toframe)
+[draft-reordering.html](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc-dev.cgi?url=https://raw.githubusercontent.com/markusa/draft-reordering/master/draft-reordering.mkd&inputtype=kramdown&format=v3ascii&mode=html) [(Debug)](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc-dev.cgi?url=https://raw.githubusercontent.com/markusa/draft-reordering/master/draft-reordering.mkd&inputtype=kramdown&format=v3ascii&mode=html&type=toframe)
 
 `make` is used to automate the build process and supports:
 

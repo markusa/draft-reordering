@@ -1,7 +1,7 @@
 ---
-title: Multipath sequence reconstruction
-abbrev: Multipath sequence reconstruction
-docname: draft-bla-iccrg-reordering-00
+title: Multipath sequence maintenance
+abbrev: Multipath sequence maintenance
+docname: draft-amend-iccrg-multipath-reordering-00
 date: 2020-07-07
 category: exp
 
@@ -18,12 +18,22 @@ author:
  -
   ins: M. Amend
   name: Markus Amend
-  organization: Deutsche Telekom
-  email: markus.amend@telekom.de
+  org: Deutsche Telekom
+  abbrev: DT
+  street: Deutsche-Telekom-Allee 9
+  city: Darmstadt
+  code: 64295
+  country: Germany
+  email: Markus.Amend@telekom.de
  -
-  ins: D. v. Hugo
+  ins: D. von Hugo
   name: Dirk von Hugo
-  organization: Deutsche Telekom
+  org: Deutsche Telekom
+  abbrev: DT
+  street: Deutsche-Telekom-Allee 9
+  city: Darmstadt
+  code: 64295
+  country: Germany
   email: dirk.von-Hugo@telekom.de
 
 normative:
@@ -107,6 +117,12 @@ re-arrangement has to occur before delivery to the application at the far end
 site.  This can be performed at earliest at the aggregation node with a minimum
 additional delay due to re-transmission requests or at latest either by the
 application on the host itself or the transmission protocol.
+
+It is a goal of the present document to collect and describe mechanisms to
+maintain the sequence of split traffic over multiple paths. These mechanisms are
+generic and not dedicated to a specific multipath network protocol, but give
+clear guidance on requirements and benefits to maintainers of multipath network
+protocols.
 
 # State of the Art
 
@@ -215,11 +231,11 @@ overview of possible distribution schemes. For this document it is assumed, that
 schedulers are used, which simultaneously distributes traffic over more than one
 path and latency difference(s) exists between those multiple paths.
 
-# Reconstruction mechanisms
+# Resequencing mechanisms
 
-Reconstruction mechanism are responsible to modify the sequence of received data
+Resequencing mechanism are responsible to modify the sequence of received data
 split over multiple paths according to a sequencing scheme. The degree of
-reconstruction can reach from now measure up to re-generating the exact order.
+resequencing can reach from now measure up to re-generating the exact order.
 
 Typically at least one sequencing scheme describing the order of how data was
 generated on sender side and is referred to as "overall sequencing". Under
@@ -232,8 +248,8 @@ which does not guarantee successful transmission. For example
 {{I-D.deconinck-quic-multipath}} and {{I-D.ietf-quic-datagram}} are unreliable
 in that sense.
 
-For simplicity all the mechanism described in the following are explained with
-two paths but work with an unlimited number though.
+For simplicity all the mechanism described in the following are explained based
+on two paths but work with an unlimited number though.
 
 ## Passive
 Nothing is done.
@@ -252,7 +268,7 @@ the latency differences between paths.
 
 ## Delay Equalization
 Delay data on the faster path by the latency difference to the slower path.
-Strictly spoken no reconstruction based on sequencing information.
+Strictly spoken no resequencing based on sequencing information.
 
 ## Fast Packet Loss Detection
 
@@ -267,12 +283,28 @@ then packet loss.
 Requires at least three packets in-order on a path to work to identify loss of
 the middle packet.
 
+#Recovery mechanisms
+
+Recovering packets, in particular lost packets or assumed lost packets on
+receiver side avoids re-transmission and potentially mitigates the resequencing
+process in respect to detecting packet loss. Shorter latencies will be an
+expected outcome. Discussing the complexity, computation overhead and
+reachable benefit is subject of this section.
+
 ## FEC
 Introduce redundancy to reconstruct data.
 Are there two possibilities: Per-path FEC & overall FEC?
 
 ## Network Coding
 Linear network coding
+
+#Retransmission mechanisms
+
+Re-transmission becomes interesting when it can help to reduce the time spent on
+waiting for outstanding packets for re-sequencing. In particular scenarios when
+the RTT lets expect a shorter time to re-transmit than wait for packet loss
+detection, a likely scenario in e.g. {: #fig-arch title="Reference Architecture for multi-path re-ordering"}. It could also avoid a potential late triggering of
+re-transmission by the end-to-end service.
 
 ## Fast re-transmission
 Signal to the sender to re-transmit a missing packet.

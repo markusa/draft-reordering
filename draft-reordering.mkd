@@ -303,7 +303,7 @@ Linear network coding
 Re-transmission becomes interesting when it can help to reduce the time spent on
 waiting for outstanding packets for re-sequencing. In particular scenarios when
 the RTT lets expect a shorter time to re-transmit than wait for packet loss
-detection, a likely scenario in e.g. {: #fig-arch title="Reference Architecture for multi-path re-ordering"}. It could also avoid a potential late triggering of
+detection, a likely scenario in e.g. {{fig-arch}}. It could also avoid a potential late triggering of
 re-transmission by the end-to-end service.
 
 ## Fast re-transmission

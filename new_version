@@ -1,0 +1,309 @@
+---
+title: Multipath sequence maintenance
+abbrev: Multipath sequence maintenance
+docname: draft-amend-iccrg-multipath-reordering-00
+date: 2020-07-07
+category: exp
+
+ipr: trust200902
+area: IRTF
+workgroup: ICCRG Working Group
+keyword: Internet-Draft
+
+coding: us-ascii
+stand_alone: yes
+pi: [toc, sortrefs, symrefs]
+
+author:
+ -
+  ins: M. Amend
+  name: Markus Amend
+  org: Deutsche Telekom
+  abbrev: DT
+  street: Deutsche-Telekom-Allee 9
+  city: Darmstadt
+  code: 64295
+  country: Germany
+  email: Markus.Amend@telekom.de
+ -
+  ins: D. von Hugo
+  name: Dirk von Hugo
+  org: Deutsche Telekom
+  abbrev: DT
+  street: Deutsche-Telekom-Allee 9
+  city: Darmstadt
+  code: 64295
+  country: Germany
+  email: dirk.von-Hugo@telekom.de
+
+normative:
+
+informative:
+  RFC0793:
+  RFC6824:
+  RFC8684:
+  RFC8743:
+  I-D.bonaventure-iccrg-schedulers:
+  I-D.deconinck-quic-multipath:
+  I-D.ietf-quic-recovery:
+  I-D.huitema-quic-ts:
+  I-D.zhu-intarea-mams-user-protocol:
+  I-D.zhu-intarea-gma:
+  I-D.amend-tsvwg-multipath-dccp:
+  I-D.ietf-quic-datagram:
+
+--- abstract
+
+This document discusses the issue of packet re-ordering which occurs as a
+specific problem in multi-path connections without reliable transport protocols
+such as TCP.  The topic is relevant for devices connected via multiple accesses
+technologies towards the network as is foreseen e.g. within Access Traffic
+Selection, Switching, and Splitting (ATSSS) service of 3rd Generation
+Partnership Project (3GPP) enabling fixed mobile converged (FMC) scenario.
+
+--- middle
+
+# Introduction {#intro}
+
+Mobile end user devices nowadays are mostly equipped with multiple network
+interfaces allowing to connect to more than one network at a time and thus
+increase data throughput, reliability, coverage and so on. Ideally the user data
+stream originating from the application at the device is split between the
+available (here: N) paths at the sender side and re-assembled at an intermediate
+aggregation node before transmitted to the corresponding host in the network as
+depicted in {{fig-arch}}.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+                   ------------                
+                  /            \               
+       +---------| Access Net 1 |--+
+       |         \             /   |
+       |          -------------    |
+       |          ------------     |
+       |         /            \    |
+       | +------| Access Net 2 |-+ |
+       | |       \            /  | |
+       | |        ------------   | |
+       | |                       | |
+       | |                       | |
+       | |               +-------+-+---+ 
+    +--+-+-+             |             |           +------+
+    |End   |             | Aggregation +----/.../--| Host |
+    |User  |             |    Node     |           +------+
+    |Device|             |             |   
+    +--+-+-+             +-------+-+---+ 
+       | |                       | |
+       | |     --------------    | |
+       | |    /              \   | |
+       | +---| Access Net N-1 |--+ |
+       |      \              /     |
+       |       --------------      |
+       |                           |
+       |          ------------     |
+       |         /            \    |
+       +--------| Access Net N |---+
+                 \            /
+                  ------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{: #fig-arch title="Reference Architecture for multi-path re-ordering"}
+
+However, when several paths are utilized concurrently to transmit user data
+between the sender and the receiver, different characteristics of the paths in
+terms of bandwidth, delay, or error proneness can impact the overall performance
+due to delayed packet arrival and need for re-transmit in case of lost packets.
+Without further arrangements the original order of packets at the sending UE
+side is no longer maintained at the receiving host and a re-ordering or
+re-arrangement has to occur before delivery to the application at the far end
+site.  This can be performed at earliest at the aggregation node with a minimum
+additional delay due to re-transmission requests or at latest either by the
+application on the host itself or the transmission protocol.
+
+It is a goal of the present document to collect and describe mechanisms to
+maintain the sequence of split traffic over multiple paths. These mechanisms are
+generic and not dedicated to a specific multipath network protocol, but give
+clear guidance on requirements and benefits to maintainers of multipath network
+protocols.
+
+# State of the Art
+
+Regular TCP protocol {{RFC0793}} offers such mechanism with queues for in-order
+and out-of order (including damaged, lost, duplicated) arrival of packets.
+
+This is also provided by MPTCP {{RFC6824}} as the first and successful Multipath
+protocol which however also requires new methods as sequence numbers both on
+(whole) data (stream) and subflow level to ensure in-order delivery to the
+application layer on the receiver side {{RFC8684}}.  Moreover, careful design of
+buffer sizes and interpretation of sequence numbers to distinguish between
+(delayed) out-of-order packets and completely lost ones has to be considered.
+
+{{I-D.bonaventure-iccrg-schedulers}} already reflects on proper packet
+scheduling schemes (at the sender side) to reduce the effort for re-assembly or
+even make such (time consuming) treatment unnecessary.
+
+MP-QUIC {{I-D.deconinck-quic-multipath}} introduces the concept of uniflows with
+own IDs claiming to get rid of additional sequence numbers for re-ordering as
+required in Multipath TCP {{RFC6824}}.
+Although [] admits that statistical performance information should help a host
+in deciding on optimum packet scheduling and flow control a dedicated packet
+scheduling policy is out of scope of that document. A further improvement versus
+MPTCP can be achieved by decoupling paths used for data transmission from those
+for sending acknowledgments (ACKs) or claiming for re-transmission by NACKs to
+not introduce further latency.
+
+{{I-D.ietf-quic-recovery}} specifies algorithms for QUIC Loss Detection and
+Congestion Control by using measurement of Round Trip Time (RTT) to determine
+when packets should be retransmitted.
+Draft {{I-D.huitema-quic-ts}} proposes to enable one way delay (1WD)
+measurements in QUIC by defining a TIME_STAMP frame to carry the time at which a
+packet is sent and combine the ACKs sent with a timestamp field and thus allow
+for more precise estimation of the (one-way) delay of each uniflow, assisting
+proper scheduling decisions.
+
+Also other protocols as Multi-Access Management Services (MAMS) {{RFC8743}}
+consider the need for re-ordering on User Plane level which may be done at
+network and client level by introducing a new Multi-Access (MX) Convergence
+Layer.  {{I-D.zhu-intarea-mams-user-protocol}} introduces accordingly Traffic
+Splitting Update (TSU) messages and Packet Loss Report (PLR) messages including
+beside others Traffic Splitting Parameters and an expected next (in-order)
+sequence number, respectively.
+
+{{I-D.zhu-intarea-gma}} on Generic Multi-Access (GMA) Convergence Encapsulation
+Protocols introduces a trailer-based encapsulation which carries one or multiple
+IP packets or fragments thereof in a Protocol Data Unit (PDU). 
+At receiver side PDUs with identical Sequence Numbers (in the trailer) are to be
+placed in the relative order indicated by a so-called Fragment Offset.
+
+# Problem Statement
+
+Assuming for simplicity the minimum multipath scenario with two separate paths
+for transmission of a flow of packets with sequence numbers (SN) SN1 ... SM. In
+case the scheduling of packets is done equally to both paths and path 2 exhibits
+a delay of the duration of transmission time required for e.g. two packets
+(assuming fixed packet size and same constant data for both paths) for an
+exemplary App-originated sequence of packets as 
+SN1 SN2 SN3 SN4 SN5 SN6 SN7 SN8 ...
+the resulting sequence of packets could look as depicted in {{fig-scrambling}}
+which of course depends on the queue processing and buffering at the Aggregation 
+Proxy.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+APP              UE              Aggregation Node                 Host
+ |  SN1 ... SN8  |                          |                       |
+ |-------------->| path 1 SN1 SN3 SN5 SN7...|                       |
+ |               |------------------------->|                       |
+ |               | path 2 SN2 SN4 SN6 SN8...|                       |
+ |               |------------------------->|                       |
+ |               |                          |SN1 SN3 SN2 SN5 SN4 SN7|
+ |               |                          |======================>|
+ |               |                          |                       |
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{: #fig-scrambling title="Exemplary data transmission for a dual-path scenario"}
+
+
+In such a case re-ordering at the Aggregation Node would be simple and straight
+forward.  It even could be avoided if the scheduling would already take the
+expected different delays into account (e.g. by pre-delaying the traffic on path
+1 thus of course not leveraging the lower delay).
+Different from this simplistic scenario in general the data rate on both paths
+will vary in time and be not equal, also different and variable latency (jitter)
+per path will be introduced and in addition loss of packets as well as potential
+duplication may occur making the situation much more complicated. In case of
+loss detection after a threshold waiting time a retransmission could be
+initiated by the Host or if possible by the Aggregation Node.
+Alternatively the UE could send redundant packets in advance coded in such a
+way that it allows for derivation of e.g. one lost packet per M correctly
+received ones or by a (real-time) application able to survive single lost
+packets.
+ 
+Holding multiple queues and a large enough buffer both at UE
+and at the Aggregation Node would be required to apply proper scheduling at
+UE and reordering during re-assembly at Aggregation Node to mitigate the
+sketched impact of multiple paths variable characteristics in terms of
+transmission performance.
+
+   ...
+
+# Scheduling mechanisms
+
+Scheduling mechanisms decide on sender side how traffic is distributed over
+the paths of a multipath-setup. {{I-D.bonaventure-iccrg-schedulers}} gives an
+overview of possible distribution schemes. For this document it is assumed, that
+schedulers are used, which simultaneously distribute traffic over more than one
+path and latency difference(s) exist(s) between those multiple paths.
+
+# Resequencing mechanisms
+
+Resequencing mechanism are responsible to modify the sequence of received data
+split over multiple paths according to a sequencing scheme. The degree of
+resequencing can reach from no measure up to re-generating the exact order.
+
+Typically at least one sequencing scheme describing the order of how data was
+generated on sender side and is referred to as "overall sequencing". Under
+certain circumstances an additional sequencing scheme per path of the multi-path
+setup can be leveraged to optimize packet loss detection. For most multipath
+protocols both sequencing schemes are already available.
+Packet loss detection becomes important when multipath protocols are applied
+which does not guarantee successful transmission. For example
+{{I-D.amend-tsvwg-multipath-dccp}} or the combination of
+{{I-D.deconinck-quic-multipath}} and {{I-D.ietf-quic-datagram}} are unreliable
+in that sense.
+
+For simplicity all the mechanism described in the following are explained based
+on two paths but work with an unlimited number though.
+
+## Passive
+This approach includes no active change or reordering at the transport level and purely re-combines the packet flows incoming from both paths as is.  All modification of the resulting sequence of packets is left to the application at the end node.  Here no processing delay is added due to the resequencing but since no early packet loss detection with subsequent re-transmission request on transport level is possible the risk of a larger delay due to late loss detection at the application will arise in case of lossy connections.
+
+## Exact
+This approach covers all mechanisms wich attempt to re-generate the original order of packets in the flow exactly, independent of the expected or resulting delay due to waiting time for all packets on all paths to arrive.  In case of unreliable transport protocols this may result in an large delay due to Head-of-Line blocking and for actual packet loss in a remaining packet gap this approach is only useful for network protocols which include re-transmission.  	For applications demanding near real-time delivery of packets it should not be applied.
+
+## Static Expiration
+This method to detect and decide on packet loss assumes a certain fixed time threshold for the gap between packets within a sequence after re-combination of both paths.  Since a re-transmission will not be requested before this threshold an additional delay in the overall latency budget this simple approach is only recommended for non-time critical applications.
+
+## Adaptive Expiration
+Here the packet gap is assumed as packet loss after exceeding a flexibly decided on time threshold which may be derived dynamically from the differences between latencies both paths exhibit.  As the latency may vary due to propagation conditions or routing paths this latency difference has to be monitored and statistically evaluated (smoothed) which introduces additional effort.
+
+## Delay Equalization
+This is a scheduling mechanism which delays data transmission on the faster path by the latency difference to the slower path.  Ideally the resequencing effort on the aggreged packet flow can be greatly reduced up to no resequencing at all.  Due to time variation in path delays (jitter) and delay differences and required time for decision and feedback on the delay some re-ordering still remains to be executed. 
+Strictly speaking no resequencing based on sequencing information.
+
+## Fast Packet Loss Detection
+
+The following sections describe methods to achieve detection of packet loss in a quick manner.
+ 
+### Using overall sequencing
+Compare the overall sequence number arriving. When on all path a higher number
+is received than the one which is waited for, packet loss can is given.
+
+### Using per-path sequencing
+For environments where no per-path scrambling is given.
+Compare distance between path sequencing and overall sequencing. When mismatch
+then packet loss.
+Requires at least three packets in-order on a path to work to identify loss of
+the middle packet.
+
+#Recovery mechanisms
+
+Recovering packets, in particular lost packets or assumed lost packets on
+receiver side avoids re-transmission and potentially mitigates the resequencing
+process in respect to detecting packet loss. Shorter latencies will be an
+expected outcome. Discussing the complexity, computation overhead and
+reachable benefit is subject of this section.
+
+## FEC
+Introduce redundancy to reconstruct data.
+Are there two possibilities: Per-path FEC & overall FEC?
+
+## Network Coding
+Linear network coding
+
+#Retransmission mechanisms
+
+Re-transmission becomes interesting when it can help to reduce the time spent on
+waiting for outstanding packets for re-sequencing. In particular scenarios when
+the RTT lets expect a shorter time to re-transmit than wait for packet loss
+detection, a likely scenario in e.g. {{fig-arch}}. It could also avoid a potential late triggering of
+re-transmission by the end-to-end service.
+
+## Fast re-transmission
+Signal to the sender to re-transmit a missing packet.

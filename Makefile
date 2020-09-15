@@ -19,10 +19,10 @@ full: spell all
 	$(xml2rfc_prep) $@
 
 %.html: %.xml
-	$(xml2rfc) --html $< $@
+	$(xml2rfc) $< -o $@ --html 
 
 %.txt:	%.xml
-	$(xml2rfc)  $< $@
+	$(xml2rfc) $< -o $@ --text
 
 spell: $(SOURCES)
 	cspell --no-summary --color $(SOURCES)

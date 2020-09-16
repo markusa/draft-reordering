@@ -31,5 +31,6 @@ spell_list: $(SOURCES)
 	cspell --no-summary --wordsOnly -u $(SOURCES)|sed 's/.*/       "&"/'|sed '$$!s/$$/,/'
 
 clean: $(SOURCES)
-	find . -type f -name '$(basename $(SOURCES))*' -not -name '$(SOURCES)' -delete
+	$(foreach source, $(SOURCES), \
+		find . -type f -name '$(basename $(source))*' -not -name '$(source)' -delete;)
 	rm -f metadata.min.js

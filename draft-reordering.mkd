@@ -51,6 +51,40 @@ informative:
   I-D.zhu-intarea-gma:
   I-D.amend-tsvwg-multipath-dccp:
   I-D.ietf-quic-datagram:
+  I-D.song-mptcp-owl:
+  OTIAS:
+     title: Out-of-Order Transmission for In-Order Arrival Scheduling for Multipath TCP
+     author:
+       - name: Fan Yang
+       - name: Qi Wang
+       - name: Paul D. Amer
+     date: May 2014
+     target: https://doi.org/10.1109/WAINA.2014.122
+     seriesinfo:
+       AINAW: 28th International Conference on Advanced Information Networking and Applications Workshops
+  DAPS:
+     title: "DAPS: Intelligent delay-aware packet scheduling for multipath transport"
+     author:
+       - name: Nicolas Kuhn
+       - name: Emmanuel Lochin
+       - name: Ahlem Mifdaoui
+       - name: Golam Sarwar
+       - name: Olivier Mehani
+       - name: Roksana Boreli
+     date: June 2014
+     target: https://doi.org/10.1109/ICC.2014.6883488
+     seriesinfo:
+       ICC: IEEE International Conference on Communications
+  BLEST:
+     title: "BLEST: Blocking estimation-based MPTCP scheduler for heterogeneous networks"
+     author:
+       - name: Simone Ferlin
+       - name: Özgü Alay
+       - name: Olivier Mehani
+       - name: Roksana Boreli
+     date: May 2014
+     target: https://doi.org/10.1109/IFIPNetworking.2016.7497206
+     seriesinfo: IFIP Networking Conference 
 
 --- abstract
 
@@ -90,7 +124,7 @@ depicted in {{fig-arch}}.
     +--+-+-+             |             |           +------+
     |End   |             | Aggregation +----/.../--| Host |
     |User  |             |    Node     |           +------+
-    |Device|             |             |   
+    |Device|             |             |
     +--+-+-+             +-------+-+---+ 
        | |                       | |
        | |     --------------    | |
@@ -230,22 +264,37 @@ the paths of a multipath-setup. {{I-D.bonaventure-iccrg-schedulers}} gives an
 overview of possible distribution schemes. For this document it is assumed, that
 schedulers are used, which simultaneously distribute traffic over more than one
 path, whereas path characteristics differ between those multiple paths (e.g. a
-latency difference exists).
+latency difference exists). While on the one hand, the traffic scheduling causes
+out-of-order multipath delivery when simultaneously utilize heterogeneous paths,
+it can also be used to mitigate this problem. Pre-delaying data on a fast path,
+according to the latency difference of the slowest path is aimed e.g. by OTIAS
+{{OTIAS}}, DAPS {{DAPS}} and BLEST {{BLEST}}. However, the success is much
+dependent on the accuracy of path information like path latency, throughput and
+packet loss rate.
+In heterogeneous and volatile environments most often such information have to
+be estimated, e.g. using congestion control. That means, it takes at least one
+RTT to gain first indications and probably several RTTs to converge to a
+worthwhile accuracy. Changes of path characteristics in sub-RTT time frames puts
+such a system to test.
+Dependent on the demand on in-order delivery and/or the accuracy of the relevant
+path information, scheduling might be an exclusive alternative or can be applied
+in conjunction with other discussed mechanisms in this document.
 
-# Resequencing mechanisms
+Scheduling will not help to overcome any degree of out-of-order delivery, when
+the scheduling goal is different to this. For example a strict cost
+prioritization of Wi-Fi over cellular access in a mobile phone might be assumed
+counterproductive.
+
+# Resequencing mechanisms {#resequencing}
 
 Resequencing mechanism are responsible to modify the sequence of received data
 split over multiple paths according to a sequencing scheme. The degree of
 resequencing can reach from no measure up to re-generating the exact order.
 
-Typically at least one sequencing scheme describing the order of how data was
-generated on sender side and is referred to as "overall sequencing". Under
-certain circumstances an additional sequencing scheme per path of the multi-path
-setup can be leveraged to optimize packet loss detection. For most multipath
-protocols both sequencing schemes are already available.
-Packet loss detection becomes important when multipath protocols are applied
-which do not guarantee successful transmission as TCP achieves by acknowledgement of successful reception. For example
-{{I-D.amend-tsvwg-multipath-dccp}} or the combination of
+Typically at least one sequencing scheme, describing the order of how data was
+generated on sender side is prerequisite. This is referred to as "connection sequencing". Under certain circumstances an additional sequencing scheme per path of the multi-path
+setup can be leveraged, to optimize packet loss detection and is further elaborated in {{loss_detection}}. For most multipath protocols both sequencing schemes are already available. Packet loss detection becomes important when multipath protocols are applied
+which do not guarantee successful transmission as TCP achieves by acknowledgement of successful reception. For example {{I-D.amend-tsvwg-multipath-dccp}} or the combination of
 {{I-D.deconinck-quic-multipath}} and {{I-D.ietf-quic-datagram}} are unreliable protocols
 in that sense.
 
@@ -256,34 +305,56 @@ on two paths but in principle would work with an unlimited number though.
 This approach includes no active change or reordering at the transport level and purely re-combines the packet flows incoming from both paths as is.  All modification of the resulting sequence of packets is left to the application at the end node.  Here no processing delay is added due to the resequencing but since no early packet loss detection with subsequent re-transmission request on transport level is possible the risk of a larger delay due to late loss detection at the application will arise in case of lossy connections.
 
 ## Exact
-This approach covers all mechanisms which attempt to re-generate the original order of packets in the flow exactly, independent of the expected or resulting delay due to waiting time for all packets on all paths to arrive.  In case of unreliable transport protocols this may result in an large delay due to Head-of-Line blocking and for actual packet loss in a remaining packet gap this approach is only useful for network protocols which include re-transmission. For applications demanding near real-time delivery of packets it should not be applied.
+This approach covers all mechanisms which attempt to re-generate the original order of packets in the flow exactly, independent of the expected or resulting delay due to waiting time for all packets on all paths to arrive.  In case of unreliable transport protocols this may result in a large delay due to Head-of-Line blocking and for actual packet loss in a remaining packet gap which causes a stand still without an option to recover. For applications demanding near real-time delivery of packets it should not be applied.
 
 ## Static Expiration {#static_exp}
-This method to detect and decide on packet loss assumes a certain fixed time threshold for the gap between packets within a sequence after re-combination of both paths.  Since a re-transmission will not be requested before this threshold an additional delay in the overall latency budget this simple approach is only recommended for non-time critical applications.
+This method to detect and decide on packet loss assumes a certain fixed time threshold for the gap between packets within a sequence after re-combination of both paths. 
+Since a possible re-transmission - either in the multipath system internal or based on the piggybacked protocol/service - will possibly not be requested before this threshold an additional delay in the overall latency budget this simple approach is only recommended for non-time critical applications. Every packet loss or simultaneous transmission of data over
+the short and long latency path will cause spikes in the service perceived latency.
 
 ## Adaptive Expiration {#adaptive_exp}
-Here the packet gap is assumed as packet loss after exceeding a flexibly decided on time threshold which may be derived dynamically from the differences between latencies both paths exhibit.  As the latency may vary due to propagation conditions or routing paths this latency difference has to be monitored and statistically evaluated (smoothed) which introduces additional effort.
+Here the packet gap is assumed as packet loss after exceeding a flexibly decided on time threshold which may be derived dynamically from the differences between latencies both paths exhibit.  As the latency may vary due to propagation conditions or routing paths this latency difference has to be monitored and statistically evaluated (smoothed) which introduces additional effort. A possible solution for this is the determination
+of the the one way latency as described in {{I-D.song-mptcp-owl}} or sending
+available RTT information from the sender from which the receiver can calculate
+the latency difference.
 
 ## Delay Equalization
-This is an ordering mechanism which delays data transmission on the faster path by the latency difference to the slower path.  Ideally the resequencing effort on the aggregated packet flow can be greatly reduced up to no resequencing at all.  Due to time variation in path delays (jitter) and delay differences and required time for decision and feedback on the delay some re-sequencing still remains to be executed.
+This is an ordering mechanism which delays data forwarding on the faster path by the latency difference to the slower path.  Ideally the resequencing effort on the aggregated packet flow can be greatly reduced up to no resequencing at all.  Due to time variation in path delays (jitter) and delay differences and required time for decision and feedback on the delay some re-sequencing still remains to be executed. Similar to {{adaptive_exp}},
+the latency difference is required.
 Strictly speaking this method allows to avoid resequencing based on sequencing information.  However, the overall delay may be larger since the advantage of the short-delay path is not exploited.
 In combination with {{static_exp}} or {{adaptive_exp}} resequencing can be added
 with a presumably lower resequencing effort to scenarios without delay equalization. The essence is a in-order stream with a unified latency across the multiple paths.
 
-## Fast Packet Loss Detection
+## Fast Packet Loss Detection {#loss_detection}
 
-The following sections describe methods to achieve unambiguous detection of packet loss and differentiation from delayed delivery in a quick manner.
+The following sections describe methods to achieve unambiguous detection of packet
+loss independent from thresholds in {{static_exp}} or {{adaptive_exp}}. Furthermore,
+packet loss can be differentiated from delayed delivery. The benefit is a much
+faster decision plane based on monitoring the sequence space of consecutive packets.
+For that, the sequencing coming along with the receiver based re-sequencing is
+further leveraged. Two sequencing schemes are considered here, the connection
+and the per-path sequencing.
  
-### Using overall sequencing
-Compare the overall sequence number arriving. When on all path a higher number
-is received than the one which is waited for (next expected in-order packet), packet loss is given.
+### Connection sequencing
+Connection sequencing marks the outgoing packets in the order they enter the multipath system and is independent from a particular selected path for transmission.
+[to be continued...]
 
-### Using per-path sequencing
-For environments where no per-path scrambling is given.
-Compare distance between path sequencing and overall sequencing. When mismatch
-then packet loss.
-Requires at least three packets in-order on a path to work to identify loss of
-the middle packet.
+[//]: # (Compare the connection sequence number arriving. When on all path a higher number is received than the one which is waited for (next expected in-order packet), packet loss is given.)
+
+### Per-path sequencing
+Per-path sequencing is a path inherent sequencing mechanism valid in the particular
+path domain only.
+[to be continued...]
+
+[//]: # (Compare the per-path sequence number arriving. When a higher sequence is received than the one which is waited for (next expected in-order packet), packet loss is given. That excludes path )
+
+
+### Combination connection and per-path sequencing
+While the benefits from the individual sequencing schemes above can be
+combined, a further benefit crystallizes.
+[to be continued...]
+
+[//]: # (For environments where no per-path scrambling is given. Compare distance between path sequencing and connection sequencing. When mismatch then packet loss. Requires at least three packets in-order on a path to work to identify loss of the middle packet.)
 
 #Recovery mechanisms
 
@@ -306,28 +377,36 @@ Triangular network coding (TNC) addresses the high encoding and decoding computa
 
 Re-transmission becomes interesting when it can help to reduce the time spent on
 waiting for outstanding packets for re-sequencing. In particular scenarios when
-the RTT (Round Trip Time) lets expect a shorter time to re-transmit than wait for packet loss
-detection, a likely scenario in e.g. {{fig-arch}}. It could also avoid a
-potential late triggering of re-transmission by the end-to-end service.
+for example a known path RTT (Round Trip Time) lets expect a shorter time to
+re-transmit than wait for packet loss detection, a likely scenario in e.g.
+{{fig-arch}}. It could also avoid a potential late triggering of re-transmission
+by the end-to-end service.
 
 ## Signalling {#retransmission_signalling}
-Signal to the sender to re-transmit a missing packet and requires a send buffer
-similar to the {{RFC0793}} TCP send buffer.
+Signal to the sender to re-transmit a missing packet. This requires a send buffer
+which keeps information for a reasonable time, which allows the beneficial use of
+this mechanism.
+[to be continued]
+
+[//]: # (e.g. based on latency difference, buffer level,...)
 
 ## Anticipated {#retransmission_anticipated}
 Re-transmit data without being notified from the receiver when packet loss can
 be assumed, e.g. from lower layer information.
+[to be continued]
 
 ## Flow-selection
 Repeating data on the same path is not always useful. In some scenarios it make
 sense to re-transmit data on another path, e.g. when the original path is broken
 or another path is known to be faster.
 
-- Requires path independent identification of data, e.g. the overall sequencing
-- Has to consider MTU discrepancies  between paths
+- Requires path independent identification of data, e.g. the connection sequencing
+- Has to consider MTU discrepancies between paths
 
 Flow selection for re-transmitting data can be combined with
 {{retransmission_signalling}} or {{retransmission_anticipated}}. In certain
 scenarios data to be re-transmitted can be duplicated across paths to increase
-reliability. [comment]: # (Not sure if duplication should be part here or rather
-to be seen as a scheduling strategy)
+reliability.
+[to be continued]
+
+[//]: # (Not sure if duplication should be part here or rather to be seen as a scheduling strategy)

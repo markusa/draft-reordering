@@ -32,6 +32,24 @@
        "NACKs",
        "uniflow",
        "PDUs",
-      "Resequencing"
+       "Resequencing",
+       "OTIAS",
+       "seriesinfo",
+       "AINAW",
+       "DAPS",
+       "Lochin",
+       "Ahlem",
+       "Mifdaoui",
+       "Golam",
+       "Sarwar",
+       "Mehani",
+       "Roksana",
+       "Boreli",
+       "Ferlin",
+       "Özgü",
+       "Alay",
+       "IFIP",
+       "RTTs"
+
     ]
 }

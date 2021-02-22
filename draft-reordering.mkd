@@ -52,6 +52,7 @@ informative:
   I-D.amend-tsvwg-multipath-dccp:
   I-D.ietf-quic-datagram:
   I-D.song-mptcp-owl:
+  I-D.liu-multipath-quic:
   OTIAS:
      title: Out-of-Order Transmission for In-Order Arrival Scheduling for Multipath TCP
      author:
@@ -195,7 +196,7 @@ even make such (time consuming) treatment unnecessary.
 MP-QUIC {{I-D.deconinck-quic-multipath}} introduces the concept of uniflows with
 own IDs claiming to get rid of additional sequence numbers for re-ordering as
 required in Multipath TCP {{RFC8684}}.
-Although [draft-liu-multipath-quic] admits that statistical performance information should help a host
+Although {{I-D.liu-multipath-quic}} admits that statistical performance information should help a host
 in deciding on optimum packet scheduling and flow control a dedicated packet
 scheduling policy is out of scope of that document. A further improvement versus
 MPTCP can be achieved by decoupling paths used for data transmission from those

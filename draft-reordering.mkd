@@ -1,8 +1,8 @@
 ---
 title: Multipath sequence maintenance
 abbrev: Multipath sequence maintenance
-docname: draft-amend-iccrg-multipath-reordering-01
-date: 2020-11-02
+docname: draft-amend-iccrg-multipath-reordering-02
+date: 2020-02-22
 category: exp
 
 ipr: trust200902
@@ -52,6 +52,7 @@ informative:
   I-D.amend-tsvwg-multipath-dccp:
   I-D.ietf-quic-datagram:
   I-D.song-mptcp-owl:
+  I-D.liu-multipath-quic:
   OTIAS:
      title: Out-of-Order Transmission for In-Order Arrival Scheduling for Multipath TCP
      author:
@@ -84,7 +85,25 @@ informative:
        - name: Roksana Boreli
      date: May 2014
      target: https://doi.org/10.1109/IFIPNetworking.2016.7497206
-     seriesinfo: IFIP Networking Conference 
+     seriesinfo: IFIP Networking Conference
+  COPE:
+    title: "XORs in The Air: Practical Wireless Network Coding"
+    author:
+       - name: Sachin Katti
+       - name: Hariharan Rahul
+       - name: Wenjun Hu Dina Katabi
+       - name: Muriel Medard
+       - name: Jon Crowcroft
+    date: September 2006
+    target: http://nms.csail.mit.edu/~sachin/papers/copesc.pdf
+  TNC:
+    title: "Optimal solution for the index coding problem using network coding over GF(2)"
+    author:
+       - name: Jalaluddin Qureshi
+       - name: Chuan Heng Foh
+       - name: Jianfei Cai
+    date: June 2012 
+    target: https://doi.org/10.1109/SECON.2012.6275780
 
 --- abstract
 
@@ -101,7 +120,7 @@ Partnership Project (3GPP) enabling fixed mobile converged (FMC) scenario.
 
 Mobile end user devices nowadays are mostly equipped with multiple network
 interfaces allowing to connect to more than one network at a time and thus
-increase data throughput, reliability, coverage and so on. Ideally the user data
+increase data throughput, reliability, coverage, and so on. Ideally the user data
 stream originating from the application at the device is split between the
 available (here: N) paths at the sender side and re-assembled at an intermediate
 aggregation node before transmitted to the corresponding host in the network as
@@ -163,7 +182,7 @@ protocols.
 Regular TCP protocol {{RFC0793}} offers such mechanism with queues for in-order
 and out-of order (including damaged, lost, duplicated) arrival of packets.
 
-This is also provided by MPTCP {{RFC6824}} as the first and successful Multipath
+This is also provided by MPTCP {{RFC8684}} as the first and successful Multipath
 protocol which however also requires new methods as sequence numbers both on
 (whole) data (stream) and subflow level to ensure in-order delivery to the
 application layer on the receiver side {{RFC8684}}.  Moreover, careful design of
@@ -176,8 +195,8 @@ even make such (time consuming) treatment unnecessary.
 
 MP-QUIC {{I-D.deconinck-quic-multipath}} introduces the concept of uniflows with
 own IDs claiming to get rid of additional sequence numbers for re-ordering as
-required in Multipath TCP {{RFC6824}}.
-Although [] admits that statistical performance information should help a host
+required in Multipath TCP {{RFC8684}}.
+Although {{I-D.liu-multipath-quic}} admits that statistical performance information should help a host
 in deciding on optimum packet scheduling and flow control a dedicated packet
 scheduling policy is out of scope of that document. A further improvement versus
 MPTCP can be achieved by decoupling paths used for data transmission from those
@@ -252,7 +271,7 @@ packets.
 Holding multiple queues and a large enough buffer both at UE
 and at the Aggregation Node would be required to apply proper scheduling at
 UE and reordering during re-assembly at Aggregation Node to mitigate the
-sketched impact of multiple paths variable characteristics in terms of
+sketched impact of multiple paths' variable characteristics in terms of
 transmission performance.
 
    ...
@@ -268,13 +287,13 @@ latency difference exists). While on the one hand, the traffic scheduling causes
 out-of-order multipath delivery when simultaneously utilize heterogeneous paths,
 it can also be used to mitigate this problem. Pre-delaying data on a fast path,
 according to the latency difference of the slowest path is aimed e.g. by OTIAS
-{{OTIAS}}, DAPS {{DAPS}} and BLEST {{BLEST}}. However, the success is much
-dependent on the accuracy of path information like path latency, throughput and
+{{OTIAS}}, DAPS {{DAPS}}, and BLEST {{BLEST}}. However, the success is much
+dependent on the accuracy of path information like path latency, throughput, and
 packet loss rate.
 In heterogeneous and volatile environments most often such information have to
 be estimated, e.g. using congestion control. That means, it takes at least one
 RTT to gain first indications and probably several RTTs to converge to a
-worthwhile accuracy. Changes of path characteristics in sub-RTT time frames puts
+worthwhile accuracy. Changes of path characteristics in sub-RTT time frames put
 such a system to test.
 Dependent on the demand on in-order delivery and/or the accuracy of the relevant
 path information, scheduling might be an exclusive alternative or can be applied
@@ -287,19 +306,19 @@ counterproductive.
 
 # Resequencing mechanisms {#resequencing}
 
-Resequencing mechanism are responsible to modify the sequence of received data
+Resequencing mechanisms are responsible to modify the sequence of received data
 split over multiple paths according to a sequencing scheme. The degree of
 resequencing can reach from no measure up to re-generating the exact order.
 
 Typically at least one sequencing scheme, describing the order of how data was
 generated on sender side is prerequisite. This is referred to as "connection sequencing". Under certain circumstances an additional sequencing scheme per path of the multi-path
 setup can be leveraged, to optimize packet loss detection and is further elaborated in {{loss_detection}}. For most multipath protocols both sequencing schemes are already available. Packet loss detection becomes important when multipath protocols are applied
-which do not guarantee successful transmission as TCP achieves by acknowledgement of successful reception. For example {{I-D.amend-tsvwg-multipath-dccp}} or the combination of
+which do not guarantee successful transmission as TCP achieves by acknowledgement of successful reception. For example, {{I-D.amend-tsvwg-multipath-dccp}} or the combination of
 {{I-D.deconinck-quic-multipath}} and {{I-D.ietf-quic-datagram}} are unreliable protocols
 in that sense.
 
 For simplicity all the mechanism described in the following are explained based
-on two paths but in principle would work with an unlimited number though.
+on two paths but in principle would work with any other amount though.
 
 ## Passive
 This approach includes no active change or reordering at the transport level and purely re-combines the packet flows incoming from both paths as is.  All modification of the resulting sequence of packets is left to the application at the end node.  Here no processing delay is added due to the resequencing but since no early packet loss detection with subsequent re-transmission request on transport level is possible the risk of a larger delay due to late loss detection at the application will arise in case of lossy connections.
@@ -309,7 +328,7 @@ This approach covers all mechanisms which attempt to re-generate the original or
 
 ## Static Expiration {#static_exp}
 This method to detect and decide on packet loss assumes a certain fixed time threshold for the gap between packets within a sequence after re-combination of both paths. 
-Since a possible re-transmission - either in the multipath system internal or based on the piggybacked protocol/service - will possibly not be requested before this threshold an additional delay in the overall latency budget this simple approach is only recommended for non-time critical applications. Every packet loss or simultaneous transmission of data over
+A possible re-transmission - either in the multipath system internally or based on the piggybacked protocol/service - will possibly not be requested before this threshold is exceeded. Thus an additional delay in the overall latency budget will occur so that this simple approach is only recommended for non-time critical applications. Every packet loss or simultaneous transmission of data over
 the short and long latency path will cause spikes in the service perceived latency.
 
 ## Adaptive Expiration {#adaptive_exp}
@@ -319,7 +338,7 @@ available RTT information from the sender from which the receiver can calculate
 the latency difference.
 
 ## Delay Equalization
-This is an ordering mechanism which delays data forwarding on the faster path by the latency difference to the slower path.  Ideally the resequencing effort on the aggregated packet flow can be greatly reduced up to no resequencing at all.  Due to time variation in path delays (jitter) and delay differences and required time for decision and feedback on the delay some re-sequencing still remains to be executed. Similar to {{adaptive_exp}},
+This is an ordering mechanism which delays data forwarding on the faster path by the latency difference to the slower path.  Ideally the resequencing effort on the aggregated packet flow can be greatly reduced up to no resequencing at all.  Due to time variation in path delays (jitter) and delay differences and the required time for decision and feedback on the delay, some re-sequencing still remains to be executed. Similar to {{adaptive_exp}}, explicit knowledge of
 the latency difference is required.
 Strictly speaking this method allows to avoid resequencing based on sequencing information.  However, the overall delay may be larger since the advantage of the short-delay path is not exploited.
 In combination with {{static_exp}} or {{adaptive_exp}} resequencing can be added
@@ -337,16 +356,12 @@ and the per-path sequencing.
  
 ### Connection sequencing
 Connection sequencing marks the outgoing packets in the order they enter the multipath system and is independent from a particular selected path for transmission.
-[to be continued...]
-
-[//]: # (Compare the connection sequence number arriving. When on all path a higher number is received than the one which is waited for (next expected in-order packet), packet loss is given.)
+After arrival at the aggregation node the lowest packet sequence number at each of the multiple paths is compared the that of the last correctly received packet. When the numbers are not consecutive (i.e., when on all paths a higher number is received than the next expected in-order packet), an overall packet loss is detected. While only a single comparison of packet numbers has to be performed and the out-of-order arrival on a single path can be partly compensated this scheme does not allow for immediate detection of where reordering happens.
 
 ### Per-path sequencing
 Per-path sequencing is a path inherent sequencing mechanism valid in the particular
 path domain only.
-[to be continued...]
-
-[//]: # (Compare the per-path sequence number arriving. When a higher sequence is received than the one which is waited for (next expected in-order packet), packet loss is given. That excludes path )
+In this case the packets are marked by path-specific sequence numbers at the sender side and at each interface of the aggregation node the sequence numbers of arriving packets are compared on per-path level. When a higher sequence number is received than the one which is waited for (next expected in-order packet), a packet loss for this specific path is declared. This may prevent partly misinterpretation of out-of-order arrival as packet loss and allow for path specific countermeasures towards overall performance improvement, as e.g., chosing a moire robust transmission technique for this path.
 
 
 ### Combination connection and per-path sequencing
@@ -370,8 +385,8 @@ Unsuccessful application of FEC may enable quick detection of unrecoverable erro
 
 ## Network Coding
 In linear network coding (LNC) network nodes (or interfaces of a device) do not simply relay the packets of information they receive, but combine several packets together for transmission.  After reception of combined and separate packets the maximum possible information flow in a network can be detected and throughput, efficiency and scalability, as well as resilience to attacks and eavesdropping can be improved.  The method in general improves with the number of paths in excess of two.
-According to [wikipedia] drawback of LNC are high decoding computational complexity, high transmission overhead, and linear dependency among coefficients vectors for en- and decoding.
-Triangular network coding (TNC) addresses the high encoding and decoding computational complexity without degrading the throughput performance, with code rate comparable to that of linear network coding.
+According to [COPE] drawbacks of LNC are high decoding computational complexity, high transmission overhead, and linear dependency among coefficients vectors for en- and decoding.
+Triangular network coding (TNC) addresses the high encoding and decoding computational complexity without degrading the throughput performance, with code rate comparable to that of LNC. TNC is therefore advantageous for implementation on small devices mobile phones and wireless sensors with limited processing capability and power supply [TNC].
 
 #Retransmission mechanisms
 
@@ -380,7 +395,8 @@ waiting for outstanding packets for re-sequencing. In particular scenarios when
 for example a known path RTT (Round Trip Time) lets expect a shorter time to
 re-transmit than wait for packet loss detection, a likely scenario in e.g.
 {{fig-arch}}. It could also avoid a potential late triggering of re-transmission
-by the end-to-end service.
+by the end-to-end service. 
+On the other hand for sake of resource efficiency the amount of unnecessary retransmissions should be limited to not degrade the overall throughput of the connection. 
 
 ## Signalling {#retransmission_signalling}
 Signal to the sender to re-transmit a missing packet. This requires a send buffer

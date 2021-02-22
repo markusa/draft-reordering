@@ -2,7 +2,7 @@
 title: Multipath sequence maintenance
 abbrev: Multipath sequence maintenance
 docname: draft-amend-iccrg-multipath-reordering-02
-date: 2020-02-22
+date: 2021-02-22
 category: exp
 
 ipr: trust200902

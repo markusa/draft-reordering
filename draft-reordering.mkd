@@ -94,9 +94,8 @@ informative:
        - name: Wenjun Hu Dina Katabi
        - name: Muriel Medard
        - name: Jon Crowcroft
-     date: Sept. 2006
-     target: 
-http://nms.csail.mit.edu/~sachin/papers/copesc.pdf
+     date: September 2006
+     target: http://nms.csail.mit.edu/~sachin/papers/copesc.pdf
 
  TNC:
     title: "Optimal solution for the index coding problem using network coding over GF(2)"
@@ -105,8 +104,7 @@ http://nms.csail.mit.edu/~sachin/papers/copesc.pdf
        - name: Chuan Heng Foh
        - name: Jianfei Cai
      date: June 2012 
-     target: 
-https://doi.org/10.1109/SECON.2012.6275780
+     target: https://doi.org/10.1109/SECON.2012.6275780
 
 --- abstract
 
@@ -331,7 +329,7 @@ This approach covers all mechanisms which attempt to re-generate the original or
 
 ## Static Expiration {#static_exp}
 This method to detect and decide on packet loss assumes a certain fixed time threshold for the gap between packets within a sequence after re-combination of both paths. 
-A possible re-transmission - either in the multipath system internally or based on the piggybacked protocol/service - will possibly not be requested before this threshold is exceeded. Thus an additional delay in the overall latency budget willm occur so that this simple approach is only recommended for non-time critical applications. Every packet loss or simultaneous transmission of data over
+A possible re-transmission - either in the multipath system internally or based on the piggybacked protocol/service - will possibly not be requested before this threshold is exceeded. Thus an additional delay in the overall latency budget will occur so that this simple approach is only recommended for non-time critical applications. Every packet loss or simultaneous transmission of data over
 the short and long latency path will cause spikes in the service perceived latency.
 
 ## Adaptive Expiration {#adaptive_exp}

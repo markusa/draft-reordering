@@ -1,8 +1,8 @@
 ---
 title: Multipath sequence maintenance
 abbrev: Multipath sequence maintenance
-docname: draft-amend-iccrg-multipath-reordering-01
-date: 2020-11-02
+docname: draft-amend-iccrg-multipath-reordering-02
+date: 2020-02-22
 category: exp
 
 ipr: trust200902
@@ -84,9 +84,8 @@ informative:
        - name: Roksana Boreli
      date: May 2014
      target: https://doi.org/10.1109/IFIPNetworking.2016.7497206
-     seriesinfo: IFIP Networking Conference 
-
- COPE:
+     seriesinfo: IFIP Networking Conference
+  COPE:
     title: "XORs in The Air: Practical Wireless Network Coding"
     author:
        - name: Sachin Katti
@@ -94,17 +93,16 @@ informative:
        - name: Wenjun Hu Dina Katabi
        - name: Muriel Medard
        - name: Jon Crowcroft
-     date: September 2006
-     target: http://nms.csail.mit.edu/~sachin/papers/copesc.pdf
-
- TNC:
+    date: September 2006
+    target: http://nms.csail.mit.edu/~sachin/papers/copesc.pdf
+  TNC:
     title: "Optimal solution for the index coding problem using network coding over GF(2)"
     author:
        - name: Jalaluddin Qureshi
        - name: Chuan Heng Foh
        - name: Jianfei Cai
-     date: June 2012 
-     target: https://doi.org/10.1109/SECON.2012.6275780
+    date: June 2012 
+    target: https://doi.org/10.1109/SECON.2012.6275780
 
 --- abstract
 

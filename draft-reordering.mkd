@@ -40,7 +40,6 @@ normative:
 
 informative:
   RFC0793:
-  RFC6824:
   RFC8684:
   RFC8743:
   I-D.bonaventure-iccrg-schedulers:

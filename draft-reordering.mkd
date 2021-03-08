@@ -419,7 +419,7 @@ or another path is known to be faster.
 - Has to consider MTU discrepancies between paths
 
 Flow selection for re-transmitting data can be combined with
-{{retransmission_signalling}} or {{retransmission_anticipated}}. In certain
+{{retransmission_signaling}} or {{retransmission_anticipated}}. In certain
 scenarios data to be re-transmitted can be duplicated across paths to increase
 reliability.
 [to be continued]

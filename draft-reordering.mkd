@@ -397,7 +397,7 @@ re-transmit than wait for packet loss detection, a likely scenario in e.g.
 by the end-to-end service. 
 On the other hand for sake of resource efficiency the amount of unnecessary retransmissions should be limited to not degrade the overall throughput of the connection. 
 
-## Signalling {#retransmission_signalling}
+## Signaling {#retransmission_signaling}
 Signal to the sender to re-transmit a missing packet. This requires a send buffer
 which keeps information for a reasonable time, which allows the beneficial use of
 this mechanism.

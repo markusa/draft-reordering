@@ -419,7 +419,7 @@ On the other hand for sake of resource efficiency the amount of unnecessary retr
 
 ## Signaling {#retransmission_signaling}
 In case of detected packet loss the receiver has to send a corresponding signalling message to the sender to re-transmit a missing packet.
-This is the traditional way of negative	acknowledgement in case of missing the correct receiption of packets	
+This is the traditional way of negative	acknowledgement in case of missing the correct reception of packets	
 within a time window and sending a repeat-request.  This approach requires a send buffer
 which keeps information for a reasonable time, thus allowing the beneficial use of this mechanism.  On the other	
 hand the additional delay in terms of at least once the RTT until the	

@@ -117,7 +117,7 @@ informative:
 
 --- abstract
 
-This document discusses the issue of packet re-ordering which occurs as a
+This document discusses the issue of packet reordering which occurs as a
 specific problem in multi-path connections without reliable transport protocols
 such as TCP.  The topic is relevant for devices connected via multiple accesses
 technologies towards the network as is foreseen, e.g., within Access Traffic
@@ -168,14 +168,14 @@ depicted in {{fig-arch}}.
                  \            /
                   ------------
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-{: #fig-arch title="Reference Architecture for multi-path re-ordering"}
+{: #fig-arch title="Reference Architecture for multi-path reordering"}
 
 However, when several paths are utilized concurrently to transmit user data
 between the sender and the receiver, different characteristics of the paths in
 terms of bandwidth, delay, or error proneness can impact the overall performance
 due to delayed packet arrival and need for re-transmit in case of lost packets.
 Without further arrangements the original order of packets at the sending UE
-side is no longer maintained at the receiving host and a re-ordering or
+side is no longer maintained at the receiving host and a reordering or
 re-arrangement has to occur before delivery to the application at the far end
 site.  This can be performed at earliest at the aggregation node with a minimum
 additional delay due to re-transmission requests or at latest either by the
@@ -204,7 +204,7 @@ scheduling schemes (at the sender side) to reduce the effort for re-assembly or
 even make such (time consuming) treatment unnecessary.
 
 MP-QUIC {{I-D.deconinck-quic-multipath}} introduces the concept of uniflows with
-own IDs claiming to get rid of additional sequence numbers for re-ordering as
+own IDs claiming to get rid of additional sequence numbers for reordering as
 required in Multipath TCP {{RFC8684}}.
 Although {{I-D.liu-multipath-quic}} admits that statistical performance information should help a host
 in deciding on optimum packet scheduling and flow control a dedicated packet
@@ -223,7 +223,7 @@ for more precise estimation of the (one-way) delay of each uniflow, assisting
 proper scheduling decisions.
 
 Also other protocols as Multi-Access Management Services (MAMS) {{RFC8743}}
-consider the need for re-ordering on User Plane level which may be done at
+consider the need for reordering on User Plane level which may be done at
 network and client level by introducing a new Multi-Access (MX) Convergence
 Layer.  {{I-D.zhu-intarea-mams-user-protocol}} introduces accordingly Traffic
 Splitting Update (TSU) messages and Packet Loss Report (PLR) messages including
@@ -263,7 +263,7 @@ APP              UE             Aggregation Node                 Host
 {: #fig-scrambling title="Exemplary data transmission for a dual-path scenario"}
 
 
-In such a case re-ordering at the Aggregation Node would be simple and straight
+In such a case reordering at the Aggregation Node would be simple and straight
 forward.  It even could be avoided if the scheduling would already take the
 expected different delays into account (e.g. by pre-delaying the traffic on path
 1 thus of course not leveraging the lower delay).

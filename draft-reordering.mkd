@@ -48,7 +48,7 @@ informative:
   I-D.huitema-quic-ts:
   I-D.zhu-intarea-mams-user-protocol:
   I-D.zhu-intarea-gma:
-  I-D.amend-tsvwg-multipath-dccp:
+  I-D.ietf-tsvwg-multipath-dccp:
   I-D.ietf-quic-datagram:
   I-D.song-mptcp-owl:
   I-D.liu-multipath-quic:
@@ -328,7 +328,7 @@ resequencing can reach from no measure up to re-generating the exact order.
 Typically at least one sequencing scheme, describing the order of how data was
 generated on sender side is prerequisite. This is referred to as "connection sequencing". Under certain circumstances an additional sequencing scheme per path of the multi-path
 setup can be leveraged, to optimize packet loss detection and is further elaborated in {{loss_detection}}. For most multipath protocols both sequencing schemes are already available. Packet loss detection becomes important when multipath protocols are applied
-which do not guarantee successful transmission as TCP achieves by acknowledgement of successful reception. For example, {{I-D.amend-tsvwg-multipath-dccp}} or the combination of
+which do not guarantee successful transmission as TCP achieves by acknowledgement of successful reception. For example, {{I-D.ietf-tsvwg-multipath-dccp}} or the combination of
 {{I-D.deconinck-quic-multipath}} and {{I-D.ietf-quic-datagram}} are unreliable protocols
 in that sense.
 
@@ -471,5 +471,5 @@ This document does not add any additional security considerations in
 addition to the ones introduced by multipath extensions to other	
 transmission protocols as, e.g., described for MPTCP in [rfc8684].	
 Also the described issues for GMA [I-D.zhu-intarea-gma], MP-DCCP	
-[I-D.amend-tsvwg-multipath-dccp], and MP-QUIC	
+[I-D.ietf-tsvwg-multipath-dccp], and MP-QUIC	
 [I-D.liu-multipath-quic] may apply here.

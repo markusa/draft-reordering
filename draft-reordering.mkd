@@ -460,11 +460,13 @@ However, such approaches decrease the resource efficiency and reduce
 the overall user throughput.  A more pro-active measure would	
 be to encode multiple packets either on per-path or on per-connection	
 basis in a single 'repair packet' in 'XOR style' to be injected after	
-a set of packets (similarly as described in [COPE].  This would allow	
+a set of packets (similarly as described in [COPE]).  This would allow	
 to recreate exactly one lost packet out of the set in case the others	
 have been correctly received.  Depending on the anticipated loss rate	
 the amount of packets within a set is chosen to more efficiently use	
-the transmission reconsiderations as full or partial packet duplication are seen as measures including a correspondingly designed scheduling strategy and may need further elaboration in section {{scheduling mechanisms}}.
+the transmission reconsiderations as full or partial packet duplication are
+seen as measures including a correspondingly designed scheduling strategy and 
+may need further elaboration in section {{scheduling mechanisms}}.
 
 # Security Considerations	
  		

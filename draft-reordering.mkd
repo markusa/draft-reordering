@@ -119,7 +119,7 @@ informative:
 
 This document discusses the issue of packet re-ordering which occurs as a
 specific problem in multi-path connections without reliable transport protocols
-such as TCP.  The topic is relevant for devices connected via multiple accesses
+such as TCP.  The topic is relevant for devices connected via multiple access
 technologies towards the network as is foreseen, e.g., within Access Traffic
 Selection, Switching, and Splitting (ATSSS) service of 3rd Generation
 Partnership Project (3GPP) enabling fixed mobile converged (FMC) scenario.
@@ -131,7 +131,7 @@ Partnership Project (3GPP) enabling fixed mobile converged (FMC) scenario.
 Mobile end user devices nowadays are mostly equipped with multiple network
 interfaces allowing to connect to more than one network at a time and thus
 increase data throughput, reliability, coverage, and so on. Ideally the user data
-stream originating from the application at the device is split between the
+stream originating from the application at the device (User Equipment, UE) is split between the
 available (here: N) paths at the sender side and re-assembled at an intermediate
 aggregation node before transmitted to the corresponding host in the network as
 depicted in {{fig-arch}}.
@@ -182,7 +182,7 @@ additional delay due to re-transmission requests or at latest either by the
 application on the host itself or the transmission protocol.
 
 It is a goal of the present document to collect and describe mechanisms to
-maintain the sequence of split traffic over multiple paths. These mechanisms are
+maintain the sequence of traffic which is split over multiple paths. These mechanisms are
 generic and not dedicated to a specific multipath network protocol, but give
 clear guidance on requirements and benefits to maintainers of multipath network
 protocols.
@@ -280,7 +280,7 @@ packets.
  
 Holding multiple queues and a large enough buffer both at UE
 and at the Aggregation Node would be required to apply proper scheduling at
-UE and reordering during re-assembly at Aggregation Node to mitigate the
+UE and re-ordering during re-assembly at Aggregation Node to mitigate the
 sketched impact of multiple paths' variable characteristics in terms of
 transmission performance.
 
@@ -315,7 +315,7 @@ reliability of each path to optimize the	traffic scheduling for MP-DCCP, thus
 coping with reordering and	achieving in-order delivery.
      
 Scheduling will not help to overcome any degree of out-of-order delivery, when
-the scheduling goal is different to this. For example a strict cost
+the scheduling goal is different to this. For example, a strict cost
 prioritization of Wi-Fi over cellular access in a mobile phone might be assumed
 counterproductive.
 
@@ -326,9 +326,13 @@ split over multiple paths according to a sequencing scheme. The degree of
 resequencing can reach from no measure up to re-generating the exact order.
 
 Typically at least one sequencing scheme, describing the order of how data was
-generated on sender side is prerequisite. This is referred to as "connection sequencing". Under certain circumstances an additional sequencing scheme per path of the multi-path
-setup can be leveraged, to optimize packet loss detection and is further elaborated in {{loss_detection}}. For most multipath protocols both sequencing schemes are already available. Packet loss detection becomes important when multipath protocols are applied
-which do not guarantee successful transmission as TCP achieves by acknowledgement of successful reception. For example, {{I-D.amend-tsvwg-multipath-dccp}} or the combination of
+generated on sender side is prerequisite. This is referred to as "connection sequencing". 
+Under certain circumstances an additional sequencing scheme per path of the multi-path
+setup can be leveraged, to optimize packet loss detection and is further elaborated in 
+{{loss_detection}}. For most multipath protocols both sequencing schemes are already available. 
+Packet loss detection becomes important when multipath protocols are applied
+which do not guarantee successful transmission as TCP achieves by acknowledgement of successful 
+reception. For example, {{I-D.amend-tsvwg-multipath-dccp}} or the combination of
 {{I-D.deconinck-quic-multipath}} and {{I-D.ietf-quic-datagram}} are unreliable protocols
 in that sense.
 
@@ -357,7 +361,7 @@ This is an ordering mechanism which delays data forwarding on the faster path by
 the latency difference is required.
 Strictly speaking this method allows to avoid resequencing based on sequencing information.  However, the overall delay may be larger since the advantage of the short-delay path is not exploited.
 In combination with {{static_exp}} or {{adaptive_exp}} resequencing can be added
-with a presumably lower resequencing effort to scenarios without delay equalization. The essence is a in-order stream with a unified latency across the multiple paths.
+with a presumably lower resequencing effort to scenarios without delay equalization. The essence is an in-order stream with a unified latency across the multiple paths.
 
 ## Fast Packet Loss Detection {#loss_detection}
 
@@ -371,7 +375,7 @@ and the per-path sequencing.
  
 ### Connection sequencing
 Connection sequencing marks the outgoing packets in the order they enter the multipath system and is independent from a particular selected path for transmission.
-After arrival at the aggregation node the lowest packet sequence number at each of the multiple paths is compared the that of the last correctly received packet. When the numbers are not consecutive (i.e., when on all paths a higher number is received than the next expected in-order packet), an overall packet loss is detected. While only a single comparison of packet numbers has to be performed and the out-of-order arrival on a single path can be partly compensated this scheme does not allow for immediate detection of where reordering happens.
+After arrival at the aggregation node the lowest packet sequence number at each of the multiple paths is compared to that of the last correctly received packet. When the numbers are not consecutive (i.e., when on all paths a higher number is received than the next expected in-order packet), an overall packet loss is detected. While only a single comparison of packet numbers has to be performed and the out-of-order arrival on a single path can be partly compensated this scheme does not allow for immediate detection of where re-ordering happens.
 
 ### Per-path sequencing
 Per-path sequencing is a path inherent sequencing mechanism valid in the particular
@@ -395,24 +399,24 @@ Thus an improved overall performance can be	achieved in this case.  [to be check
 Recovering packets, in particular lost packets or assumed lost packets on
 receiver side avoids re-transmission and potentially mitigates the resequencing
 process in respect to detecting packet loss. Shorter latencies will be an
-expected outcome. Discussing the complexity, computation overhead and
-reachable benefit is subject of this section.
+expected outcome. Discussing the complexity, computation overhead, and
+achievable benefit is subject of this section.
 
 ## FEC (Forward Error Correction) {#FEC}
-This approach is based on introduction of redundancy to user data to detect errors and subsequently reconstruct data in case of a limited number of bit or Byte errors.  As such packet with corrupted data can be recovered up to a certain degree but in case of a too high bit error rate (BER) a packet is completely lost.  However, in combination with scrambling, i.e. the sequence of original data stream is distributed over multiple packets and re-compiled afterwards also data from lost packets could be recovered.  As such methods introduce additional delay and overhead it is mainly applied in case of long re-transmission delays as, e.g., is typical for satellite transmission.  FEC can be applied to each path separately (e.g., if they exhibit deviating performance characteristics to not degrade the 'better one') or in an overall FEC fashion before split and recombination which would support scrambling and facilitate recovery of completely lost packets on the 'worse path'.
+This approach is based on introduction of redundancy to user data to detect errors and subsequently reconstruct data in case of a limited number of bit or Byte errors.  As such a packet with corrupted data can be recovered up to a certain degree but in case of a too high bit error rate (BER) a packet has to be declared as completely lost.  However, in combination with scrambling, i.e., the sequence of original data stream is distributed over multiple packets and re-compiled afterwards, also data from otherwise lost packets could be recovered.  Since such methods introduce additional delay and overhead it is mainly applied in case of long re-transmission delays as, e.g., is typical for satellite transmission.  FEC can be applied to each path separately (e.g., if they exhibit deviating performance characteristics to not degrade the 'better one') or in an overall FEC fashion, i.e., applied before split and after recombination, which would support scrambling and facilitate recovery of completely lost packets on the 'worse path'.
 Unsuccessful application of FEC may enable quick detection of unrecoverable errors in a packet and thus trigger re-transmission from the sender side before time-out.
 
 ## Network Coding
 In linear network coding (LNC) network nodes (or interfaces of a device) do not simply relay the packets of information they receive, but combine several packets together for transmission.  After reception of combined and separate packets the maximum possible information flow in a network can be detected and throughput, efficiency and scalability, as well as resilience to attacks and eavesdropping can be improved.  The method in general improves with the number of paths in excess of two.
 According to [COPE] drawbacks of LNC are high decoding computational complexity, high transmission overhead, and linear dependency among coefficients vectors for en- and decoding.
-Triangular network coding (TNC) addresses the high encoding and decoding computational complexity without degrading the throughput performance, with code rate comparable to that of LNC. TNC is therefore advantageous for implementation on small devices mobile phones and wireless sensors with limited processing capability and power supply [TNC].
+Triangular network coding (TNC) addresses the high encoding and decoding computational complexity without degrading the throughput performance, with code rate comparable to that of LNC. TNC is therefore advantageous for implementation on small devices as mobile phones and wireless sensors with limited processing capability and power supply [TNC].
 
 # Retransmission mechanisms
 
 Re-transmission becomes interesting when it can help to reduce the time spent on
 waiting for outstanding packets for re-sequencing. In particular scenarios when
 for example a known path RTT (Round Trip Time) lets expect a shorter time to
-re-transmit than wait for packet loss detection, a likely scenario in, e.g.,
+re-transmit than wait for packet loss detection, a likely scenario as depicted in, e.g.,
 {{fig-arch}}. It could also avoid a potential late triggering of re-transmission
 by the end-to-end service. 
 On the other hand for sake of resource efficiency the amount of unnecessary retransmissions should be limited to not degrade the overall throughput of the connection. 
@@ -424,9 +428,8 @@ within a time window and sending a repeat-request.  This approach requires a sen
 which keeps information for a reasonable time, thus allowing the beneficial use of this mechanism.  On the other	
 hand the additional delay in terms of at least once the RTT until the	
 lost packet is correctly received results in performance degradation	
-for time-critical applications. ... [to be continued?]
-
-[//]: # (e.g. based on latency difference, buffer level,...)
+for time-critical applications. 
+A properly designed solution has to take into account parameters as, e.g. the experienced latency difference, the buffer size at both endpoints of the multipath segment, or the path specific packet loss probability.
 
 ## Anticipated {#retransmission_anticipated}
 To speed up the induced re-transmission delay a pro-active or anticipated approach would allow to trigger the sender to re-transmit data 
@@ -434,16 +437,17 @@ without needing to wait for notification from the receiver. This method	can be a
 on other data, e.g., from lower layer, such as information on path or	
 link quality degradation derived from, e.g., an increased raw BER	
 detected by FEC mechanism (see {{FEC}}).	
-[to be continued/extended?]
+
 
 ## Flow-selection
 Repeating data on the same path is not always useful. In some scenarios it makes
 sense to re-transmit data on another path, e.g., when the original path is broken
 or another path is known to provide higher throughput or lower packet loss.  To apply
-such a selection of	the flow for re-transmission.
+such a selection of	the flow for re-transmission
 
-- Requires path independent identification of data, e.g., the connection sequencing
+- Requires path independent identification of data, e.g., application of connection sequencing
 - Has to consider MTU discrepancies between paths
+- May have to account for path specific delay deviation
 
 Flow selection for re-transmitting data can be combined with detection mechanisms as described in
 {{retransmission_signaling}} or {{retransmission_anticipated}}. 
@@ -460,14 +464,11 @@ a set of packets (similarly as described in [COPE].  This would allow
 to recreate exactly one lost packet out of the set in case the others	
 have been correctly received.  Depending on the anticipated loss rate	
 the amount of packets within a set is chosen to more efficiently use	
-the transmission resources.
-[to be continued]
-
-[//]: # (Not sure if duplication should be part here or rather to be seen as a scheduling strategy)
+the transmission reconsiderations as full or partial packet duplication are seen as measures including a correspondingly designed scheduling strategy and may need further elaboration in section {{scheduling mechanisms}}.
 
 # Security Considerations	
  		
-This document does not add any additional security considerations in	
+This document does not add any additional security relevant features increasing overall risks and threats, in	
 addition to the ones introduced by multipath extensions to other	
 transmission protocols as, e.g., described for MPTCP in [rfc8684].	
 Also the described issues for GMA [I-D.zhu-intarea-gma], MP-DCCP	
